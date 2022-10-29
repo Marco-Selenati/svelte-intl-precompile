@@ -11,8 +11,8 @@ const intlPrecompiler = buildICUPlugin("svelte-intl-precompile");
 export function transformCode(
   code: string,
   options: Record<string, any>
-): string {
-  return babel.transform(code, { ...options, plugins: [intlPrecompiler] }).code;
+): string | null | undefined {
+  return babel.transform(code, { ...options, plugins: [intlPrecompiler] })?.code;
 }
 
 export default (localesRoot: string = "locales"): Plugin => {
@@ -39,6 +39,10 @@ export default (localesRoot: string = "locales"): Plugin => {
     // add register calls for each found locale
     for (const file of languageFiles) {
       const extname = path.extname(file);
+
+      if (extname !== ".json") {
+        throw new Error("Locale files have to be in json format!");
+      }
 
       if (transformers[extname]) {
         const locale = path.basename(file, extname);
@@ -99,11 +103,13 @@ export default (localesRoot: string = "locales"): Plugin => {
       } catch (error) {
         // incase the file did not exist try next transformer
         // otherwise propagate the error
-        if (error.code !== "ENOENT") {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
           throw error;
         }
       }
     }
+
+    return null;
   }
 
   return {
@@ -160,6 +166,8 @@ export default (localesRoot: string = "locales"): Plugin => {
 
         return normalized;
       }
+
+      return null;
     },
     load(id) {
       // allow to auto register locales by calling registerAll from $locales module
@@ -181,12 +189,16 @@ export default (localesRoot: string = "locales"): Plugin => {
           : id.slice(`${prefix}/`.length);
         return findLocale(locale);
       }
+
+      return null;
     },
     transform(content, id) {
       // import locale from '../locales/en.js'
       if (pathStartsWith(id, resolvedPath)) {
         return tranformLocale(content, id, transformers[".json"]);
       }
+
+      return null;
     },
   };
 };

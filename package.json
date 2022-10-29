@@ -30,7 +30,7 @@
     "url": "https://github.com/cibernox/svelte-intl-precompile"
   },
   "scripts": {
-    "build": "ascjs --no-default ./sveltekit-plugin.js ./sveltekit-plugin.cjs",
+    "build": "tsc --project tsconfig.json",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
@@ -51,7 +51,9 @@
     "strip-bom": "^5.0.0"
   },
   "devDependencies": {
-    "ascjs": "^5.0.1",
+    "@types/babel__core": "^7.1.19",
+    "@types/node": "^18.11.7",
+    "typescript": "^4.8.4",
     "vitest": "^0.24.3"
   }
 }
