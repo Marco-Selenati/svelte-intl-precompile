@@ -6,22 +6,8 @@
   "main": "index.cjs",
   "module": "index.js",
   "exports": {
-    ".": {
-      "node": {
-        "import": "./index.js",
-        "require": "./index.cjs"
-      },
-      "default": "./index.js"
-    },
-    "./sveltekit-plugin": {
-      "node": {
-        "import": "./sveltekit-plugin.js",
-        "require": "./sveltekit-plugin.cjs"
-      },
-      "default": "./sveltekit-plugin.js"
-    },
-    "./sveltekit-plugin.js": "./sveltekit-plugin.js",
-    "./sveltekit-plugin.cjs": "./sveltekit-plugin.cjs",
+    ".": "./dist/index.js",
+    "./sveltekit-plugin": "./dist/plugin.js",
     "./package.json": "./package.json"
   },
   "sideEffects": false,
