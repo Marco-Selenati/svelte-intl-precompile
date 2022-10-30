@@ -5,6 +5,7 @@ import * as babel from "@babel/core";
 import buildICUPlugin from "babel-plugin-precompile-intl";
 import pathStartsWith from "path-starts-with";
 import type { Plugin } from "vite";
+import createHyphenator from "hyphen";
 
 const intlPrecompiler = buildICUPlugin("svelte-intl-precompile");
 
@@ -12,7 +13,8 @@ export function transformCode(
   code: string,
   options: Record<string, any>
 ): string | null | undefined {
-  return babel.transform(code, { ...options, plugins: [intlPrecompiler] })?.code;
+  return babel.transform(code, { ...options, plugins: [intlPrecompiler] })
+    ?.code;
 }
 
 export default (localesRoot: string = "locales"): Plugin => {
@@ -87,6 +89,25 @@ export default (localesRoot: string = "locales"): Plugin => {
     filename: string,
     transform: (s: string) => Promise<string>
   ) {
+    let basename = path.parse(filename).name;
+    if (basename === "en") {
+      basename = "en-us";
+    }
+    if (basename === "de") {
+      basename = "de-1996";
+    }
+    const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
+    const hypen = createHyphenator(patterns, { async: false });
+
+    const hyphenated: Record<string, string> = {};
+
+    for (let [k, v] of Object.entries(JSON.parse(content))) {
+      const h = hypen(v);
+      hyphenated[k] = h;
+    }
+
+    content = JSON.stringify(hyphenated);
+
     const code = await transform(content);
     const transformed = transformCode(code, { filename });
     return transformed;

@@ -66,6 +66,7 @@ import * as fs from "fs/promises";
 import * as babel from "@babel/core";
 import buildICUPlugin from "babel-plugin-precompile-intl";
 import pathStartsWith from "path-starts-with";
+import createHyphenator from "hyphen";
 var intlPrecompiler = buildICUPlugin("svelte-intl-precompile");
 export function transformCode(code, options) {
     var _a;
@@ -134,12 +135,31 @@ export default (function (localesRoot) {
     }
     function tranformLocale(content, filename, transform) {
         return __awaiter(this, void 0, void 0, function () {
-            var code, transformed;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, transform(content)];
+            var basename, patterns, hypen, hyphenated, _i, _a, _b, k, v, h, code, transformed;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        basename = path.parse(filename).name;
+                        if (basename === "en") {
+                            basename = "en-us";
+                        }
+                        if (basename === "de") {
+                            basename = "de-1996";
+                        }
+                        return [4 /*yield*/, import("hyphen/patterns/".concat(basename, ".js"))];
                     case 1:
-                        code = _a.sent();
+                        patterns = (_c.sent())["default"];
+                        hypen = createHyphenator(patterns, { async: false });
+                        hyphenated = {};
+                        for (_i = 0, _a = Object.entries(JSON.parse(content)); _i < _a.length; _i++) {
+                            _b = _a[_i], k = _b[0], v = _b[1];
+                            h = hypen(v);
+                            hyphenated[k] = h;
+                        }
+                        content = JSON.stringify(hyphenated);
+                        return [4 /*yield*/, transform(content)];
+                    case 2:
+                        code = _c.sent();
                         transformed = transformCode(code, { filename: filename });
                         return [2 /*return*/, transformed];
                 }
