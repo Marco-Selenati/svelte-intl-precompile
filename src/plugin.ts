@@ -99,12 +99,23 @@ export default (localesRoot: string = "locales"): Plugin => {
     const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
     const hypen = createHyphenator(patterns, { async: false });
 
-    const hyphenated: Record<string, string> = {};
+    const traverse = (level: object) => {
+      const obj: Record<string, string | object> = {};
+      for (let [k, v] of Object.entries(level)) {
+        console.log(typeof v, v);
 
-    for (let [k, v] of Object.entries(JSON.parse(content))) {
-      const h = hypen(v);
-      hyphenated[k] = h;
-    }
+        if (typeof v === "string") {
+          const h = hypen(v);
+          obj[k] = h;
+        } else if (typeof v === "object") {
+          obj[k] = traverse(v);
+        }
+      }
+
+      return obj;
+    };
+
+    const hyphenated = traverse(JSON.parse(content));
 
     content = JSON.stringify(hyphenated);
 

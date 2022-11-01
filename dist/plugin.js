@@ -135,9 +135,9 @@ export default (function (localesRoot) {
     }
     function tranformLocale(content, filename, transform) {
         return __awaiter(this, void 0, void 0, function () {
-            var basename, patterns, hypen, hyphenated, _i, _a, _b, k, v, h, code, transformed;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var basename, patterns, hypen, traverse, hyphenated, code, transformed;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         basename = path.parse(filename).name;
                         if (basename === "en") {
@@ -148,18 +148,28 @@ export default (function (localesRoot) {
                         }
                         return [4 /*yield*/, import("hyphen/patterns/".concat(basename, ".js"))];
                     case 1:
-                        patterns = (_c.sent())["default"];
+                        patterns = (_a.sent())["default"];
                         hypen = createHyphenator(patterns, { async: false });
-                        hyphenated = {};
-                        for (_i = 0, _a = Object.entries(JSON.parse(content)); _i < _a.length; _i++) {
-                            _b = _a[_i], k = _b[0], v = _b[1];
-                            h = hypen(v);
-                            hyphenated[k] = h;
-                        }
+                        traverse = function (level) {
+                            var obj = {};
+                            for (var _i = 0, _a = Object.entries(level); _i < _a.length; _i++) {
+                                var _b = _a[_i], k = _b[0], v = _b[1];
+                                console.log(typeof v, v);
+                                if (typeof v === "string") {
+                                    var h = hypen(v);
+                                    obj[k] = h;
+                                }
+                                else if (typeof v === "object") {
+                                    obj[k] = traverse(v);
+                                }
+                            }
+                            return obj;
+                        };
+                        hyphenated = traverse(JSON.parse(content));
                         content = JSON.stringify(hyphenated);
                         return [4 /*yield*/, transform(content)];
                     case 2:
-                        code = _c.sent();
+                        code = _a.sent();
                         transformed = transformCode(code, { filename: filename });
                         return [2 /*return*/, transformed];
                 }
