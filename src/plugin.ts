@@ -102,8 +102,6 @@ export default (localesRoot: string = "locales"): Plugin => {
     const traverse = (level: object) => {
       const obj: Record<string, string | object> = {};
       for (let [k, v] of Object.entries(level)) {
-        console.log(typeof v, v);
-
         if (typeof v === "string") {
           const h = hypen(v);
           obj[k] = h;
