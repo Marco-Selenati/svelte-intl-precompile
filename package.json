@@ -38,7 +38,7 @@
   "dependencies": {
     "babel-plugin-precompile-intl": "^0.5.2",
     "path-starts-with": "^2.0.0",
-    "precompile-intl-runtime": "github:Marco-Selenati/precompile-intl-runtime#4919680991c6903e33573570f25606d6104aa79b"
+    "precompile-intl-runtime": "github:Marco-Selenati/precompile-intl-runtime#9acddb07084cde8458a1a1c57d4ed43bb8cabe77"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",
