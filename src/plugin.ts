@@ -31,7 +31,7 @@ export default (localesRoot: string = "locales"): Plugin => {
 
   async function loadPrefixModule() {
     const code = [
-      `import { register } from 'svelte-intl-precompile'`,
+      `import { register } from '@gigahatch/svelte-intl-precompile'`,
       `export function registerAll() {`,
     ];
 

@@ -25,7 +25,8 @@
     "build": "tsc --project tsconfig.json",
     "postbuild": "cp src/locales.d.ts dist/locales.d.ts",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "prepublish": "build"
   },
   "keywords": [
     "svelte",

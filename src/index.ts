@@ -1,3 +1,3 @@
 import "./locales.js";
 
-export * from "precompile-intl-runtime";
+export * from "@gigahatch/precompile-intl-runtime";
