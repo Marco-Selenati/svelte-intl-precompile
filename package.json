@@ -1,6 +1,6 @@
 {
-  "name": "svelte-intl-precompile",
-  "version": "0.12.0",
+  "name": "@gigahatch/svelte-intl-precompile",
+  "version": "1.0.0",
   "description": "I18n library for Svelte.js that analyzes your keys at build time for max performance and minimal footprint",
   "type": "module",
   "module": "./dist/index.js",
@@ -19,7 +19,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/cibernox/svelte-intl-precompile"
+    "url": "https://github.com/gigahatch/svelte-intl-precompile"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",
@@ -33,12 +33,12 @@
     "i18n",
     "precompile"
   ],
-  "author": "Miguel Camba",
+  "author": "Gigahatch",
   "license": "ISC",
   "dependencies": {
     "babel-plugin-precompile-intl": "^0.5.2",
     "path-starts-with": "^2.0.0",
-    "precompile-intl-runtime": "github:Marco-Selenati/precompile-intl-runtime#9acddb07084cde8458a1a1c57d4ed43bb8cabe77"
+    "@gigahatch/precompile-intl-runtime": "^1.0.0"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",
