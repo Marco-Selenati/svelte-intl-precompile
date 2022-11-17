@@ -1,37 +1,29 @@
 {
-  "name": "svelte-intl-precompile",
-  "version": "0.12.0",
+  "name": "@gigahatch/svelte-intl-precompile",
+  "version": "1.0.0",
   "description": "I18n library for Svelte.js that analyzes your keys at build time for max performance and minimal footprint",
   "type": "module",
-  "main": "index.cjs",
-  "module": "index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "node": {
-        "import": "./index.js",
-        "require": "./index.cjs"
-      },
-      "default": "./index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
-    "./sveltekit-plugin": {
-      "node": {
-        "import": "./sveltekit-plugin.js",
-        "require": "./sveltekit-plugin.cjs"
-      },
-      "default": "./sveltekit-plugin.js"
+    "./dist/plugin": {
+      "import": "./dist/plugin.js",
+      "types": "./dist/plugin.d.ts"
     },
-    "./sveltekit-plugin.js": "./sveltekit-plugin.js",
-    "./sveltekit-plugin.cjs": "./sveltekit-plugin.cjs",
     "./package.json": "./package.json"
   },
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/cibernox/svelte-intl-precompile"
+    "url": "https://github.com/gigahatch/svelte-intl-precompile"
   },
   "scripts": {
-    "build": "ascjs --no-default ./sveltekit-plugin.js ./sveltekit-plugin.cjs",
-    "prepublish": "npm run build",
+    "build": "tsc --project tsconfig.json",
+    "postbuild": "cp src/locales.d.ts dist/locales.d.ts",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
@@ -41,18 +33,19 @@
     "i18n",
     "precompile"
   ],
-  "author": "Miguel Camba",
+  "author": "Gigahatch",
   "license": "ISC",
   "dependencies": {
     "babel-plugin-precompile-intl": "^0.5.2",
-    "js-yaml": "^4.1.0",
-    "json5": "^2.2.0",
     "path-starts-with": "^2.0.0",
-    "precompile-intl-runtime": "^0.8.0",
-    "strip-bom": "^5.0.0"
+    "@gigahatch/precompile-intl-runtime": "^1.0.0"
   },
   "devDependencies": {
-    "ascjs": "^5.0.1",
-    "vitest": "^0.14.2"
+    "@types/babel__core": "^7.1.19",
+    "@types/hyphen": "^1.6.5",
+    "@types/node": "^18.11.7",
+    "hyphen": "^1.6.4",
+    "typescript": "^4.8.4",
+    "vitest": "^0.24.3"
   }
 }

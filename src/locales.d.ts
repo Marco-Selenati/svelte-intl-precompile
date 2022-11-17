@@ -1,0 +1,7 @@
+declare module "$locales" {
+  /** Registers all locales found in `localesRoot`. */
+  export const registerAll: () => void;
+
+  /** A list of all locales that will be registered by {@link registerAll()}. */
+  export const availableLocales: string[];
+}
