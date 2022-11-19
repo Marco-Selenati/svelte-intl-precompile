@@ -97,7 +97,7 @@ export default (localesRoot: string = "locales"): Plugin => {
       basename = "de-1996";
     }
     const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
-    const hypen = createHyphenator(patterns, { async: false });
+    const hypen = createHyphenator(patterns, { async: false, html: true });
 
     const traverse = (level: object) => {
       const obj: Record<string, string | object> = {};
