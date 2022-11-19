@@ -62,7 +62,7 @@ describe("imports", () => {
 
   it("`$locales/en.json` returns the translations for that language", async () => {
     const plugin = svelteIntlPrecompile("locales", true);
-    const content = await plugin.load("$locales/en.json");
+    const content = await plugin.load("$locales/en");
 
     expect(content).toBe(singleLineString`
       import { __interpolate } from "@gigahatch/svelte-intl-precompile";
@@ -74,7 +74,7 @@ describe("imports", () => {
 
   it("`$locales/es.json` returns the translations for that language", async () => {
     const plugin = svelteIntlPrecompile("locales", true);
-    const content = await plugin.load("$locales/es.json");
+    const content = await plugin.load("$locales/es");
     expect(content).toBe(singleLineString`
       import { __interpolate } from "@gigahatch/svelte-intl-precompile";
       export default {

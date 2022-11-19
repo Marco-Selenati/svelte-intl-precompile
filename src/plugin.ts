@@ -37,12 +37,12 @@ export async function transformCode(
       literalTransform: hyphen,
     };
   }
-  
+
   return babel.transform(code, {
     ...options,
     generatorOpts: {
       jsescOption: {
-        minimal: true,
+        minimal: true
       },
     },
     plugins: [[intlPrecompiler, opts]],
@@ -156,6 +156,11 @@ export default (
         }
       });
     },
+    
+    resolveId(id) {
+      if (id === prefix || id.startsWith(`${prefix}/`)) return id;
+      return null;
+    },
     load(id) {
       // allow to auto register locales by calling registerAll from $locales module
       // import { registerAll, availableLocales } from '$locales'
@@ -165,8 +170,7 @@ export default (
 
       // import en from '$locales/en'
       if (id.startsWith(`${prefix}/`)) {
-        console.log("ID:", id, "BASENAME:", path.basename(id));
-        return findLocale(path.basename(id), hyphenate);
+        return findLocale(`${path.basename(id)}.json`, hyphenate);
       }
 
       return null;
