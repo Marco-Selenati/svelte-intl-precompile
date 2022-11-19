@@ -38,15 +38,17 @@
   "license": "ISC",
   "dependencies": {
     "@gigahatch/babel-plugin-precompile-intl": "^1.0.0",
-    "path-starts-with": "^2.0.0",
-    "@gigahatch/precompile-intl-runtime": "^1.0.1"
+    "@gigahatch/precompile-intl-runtime": "^1.0.1",
+    "path-starts-with": "^2.0.0"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",
     "@types/hyphen": "^1.6.5",
     "@types/node": "^18.11.7",
-    "hyphen": "^1.6.4",
     "typescript": "^4.8.4",
     "vitest": "^0.24.3"
+  },
+  "peerDependencies": {
+    "hyphen": "^1.6.4"
   }
 }
