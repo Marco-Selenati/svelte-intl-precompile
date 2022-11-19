@@ -17,18 +17,16 @@ const translationFiles = {
 };
 
 beforeEach(() => {
-  vi.mock("path", () => ({
-    resolve(...paths) {
-      return ["fakeroot", ...paths].join("/");
-    },
-    extname(filename) {
-      const ext = filename.split(".")[1];
-      return ext && "." + ext;
-    },
-    basename(filename) {
-      return filename.split(".")[0];
-    },
-  }));
+  vi.mock("path", async () => {
+    const path = await vi.importActual("path");
+
+    return {
+      ...path,
+      resolve(...paths) {
+        return ["fakeroot", ...paths].join("/");
+      }
+    };
+  });
 
   vi.mock("fs/promises", () => ({
     readdir() {
@@ -50,10 +48,10 @@ afterEach(() => {
 
 describe("imports", () => {
   it("`$locales` returns a module that is aware of all the available locales", async () => {
-    const plugin = svelteIntlPrecompile("locales");
+    const plugin = svelteIntlPrecompile("locales", true);
     const content = await plugin.load("$locales");
     expect(content).toBe(singleLineString`
-    import { register } from 'svelte-intl-precompile'
+    import { register } from '@gigahatch/svelte-intl-precompile'
     export function registerAll() {
       register("en-US", () => import("$locales/en-US"))
       register("en", () => import("$locales/en"))
@@ -62,25 +60,26 @@ describe("imports", () => {
     export const availableLocales = ["en","es","en-US"]`);
   });
 
-  it("`$locales/en` returns the translations for that language", async () => {
-    const plugin = svelteIntlPrecompile("locales");
-    const content = await plugin.load("$locales/en");
+  it("`$locales/en.json` returns the translations for that language", async () => {
+    const plugin = svelteIntlPrecompile("locales", true);
+    const content = await plugin.load("$locales/en.json");
+
     expect(content).toBe(singleLineString`
-      import { __interpolate } from "svelte-intl-precompile";
+      import { __interpolate } from "@gigahatch/svelte-intl-precompile";
       export default {
-        "simple": "Simple string",
-        "interpolated": value => \`String with one \${__interpolate(value)} interpolated\`
+        "simple": "Sim\xADple string",
+        "interpolated": value => \`String with one \${__interpolate(value)} in\xADter\xADpo\xADlat\xADed\`
       };`);
   });
 
-  it("`$locales/es` returns the translations for that language", async () => {
-    const plugin = svelteIntlPrecompile("locales");
-    const content = await plugin.load("$locales/es");
+  it("`$locales/es.json` returns the translations for that language", async () => {
+    const plugin = svelteIntlPrecompile("locales", true);
+    const content = await plugin.load("$locales/es.json");
     expect(content).toBe(singleLineString`
-      import { __interpolate } from "svelte-intl-precompile";
+      import { __interpolate } from "@gigahatch/svelte-intl-precompile";
       export default {
-        "simple": "Cadena simple",
-        "interpolated": value => \`Cadena con un \${__interpolate(value)} interpolado\`
+        "simple": "Ca\xADde\xADna sim\xADple",
+        "interpolated": value => \`Ca\xADde\xADna con un \${__interpolate(value)} in\xADter\xADpo\xADla\xADdo\`
       };`);
   });
 });

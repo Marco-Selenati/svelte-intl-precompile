@@ -37,7 +37,7 @@
   "author": "Gigahatch",
   "license": "ISC",
   "dependencies": {
-    "babel-plugin-precompile-intl": "^0.5.2",
+    "@gigahatch/babel-plugin-precompile-intl": "^1.0.0",
     "path-starts-with": "^2.0.0",
     "@gigahatch/precompile-intl-runtime": "^1.0.1"
   },

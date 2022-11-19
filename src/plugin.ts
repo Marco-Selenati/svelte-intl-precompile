@@ -2,32 +2,58 @@ import * as path from "path";
 import * as fs from "fs/promises";
 
 import * as babel from "@babel/core";
-import buildICUPlugin from "babel-plugin-precompile-intl";
+import buildICUPlugin, {
+  PrecompileIntlOptions,
+} from "@gigahatch/babel-plugin-precompile-intl";
 import pathStartsWith from "path-starts-with";
 import type { Plugin } from "vite";
-import createHyphenator from "hyphen";
+import createHyphenator, { HyphenationFunctionSync } from "hyphen";
 
-const intlPrecompiler = buildICUPlugin("svelte-intl-precompile");
+const intlPrecompiler = buildICUPlugin("@gigahatch/svelte-intl-precompile");
 
-export function transformCode(
+export async function transformCode(
   code: string,
+  hyphenate: boolean,
   options: Record<string, any>
-): string | null | undefined {
-  return babel.transform(code, { ...options, plugins: [intlPrecompiler] })
-    ?.code;
+): Promise<string | null | undefined> {
+  let opts: PrecompileIntlOptions = {};
+
+  if (hyphenate) {
+    let basename = path.parse(options["filename"]).name;
+    if (basename === "en") {
+      basename = "en-us";
+    }
+    if (basename === "de") {
+      basename = "de-1996";
+    }
+
+    const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
+    const hyphen = createHyphenator(patterns, {
+      async: false,
+      html: true,
+    }) as HyphenationFunctionSync;
+
+    opts = {
+      literalTransform: hyphen,
+    };
+  }
+  
+  return babel.transform(code, {
+    ...options,
+    generatorOpts: {
+      jsescOption: {
+        minimal: true,
+      },
+    },
+    plugins: [[intlPrecompiler, opts]],
+  })?.code;
 }
 
-export default (localesRoot: string = "locales"): Plugin => {
+export default (
+  localesRoot: string = "locales",
+  hyphenate: boolean = false
+): Plugin => {
   const prefix = "$locales";
-
-  const resolvedPath = path.resolve(localesRoot);
-
-  const transformers = {
-    ".json": async (content: any) => {
-      const json = JSON.parse(content);
-      return `export default ${JSON.stringify(json)}`;
-    },
-  };
 
   async function loadPrefixModule() {
     const code = [
@@ -46,23 +72,21 @@ export default (localesRoot: string = "locales"): Plugin => {
         throw new Error("Locale files have to be in json format!");
       }
 
-      if (transformers[extname]) {
-        const locale = path.basename(file, extname);
+      const locale = path.basename(file, extname);
 
-        // ensure we register each locale only once
-        // there shouldn't be more than one file each locale
-        // our load(id) method only ever loads the first found
-        // file for a locale and it makes no sense to register
-        // more than one file per locale
-        if (!availableLocales.includes(locale)) {
-          availableLocales.push(locale);
+      // ensure we register each locale only once
+      // there shouldn't be more than one file each locale
+      // our load(id) method only ever loads the first found
+      // file for a locale and it makes no sense to register
+      // more than one file per locale
+      if (!availableLocales.includes(locale)) {
+        availableLocales.push(locale);
 
-          code.push(
-            `  register(${JSON.stringify(
-              locale
-            )}, () => import(${JSON.stringify(`${prefix}/${locale}`)}))`
-          );
-        }
+        code.push(
+          `  register(${JSON.stringify(locale)}, () => import(${JSON.stringify(
+            `${prefix}/${locale}`
+          )}))`
+        );
       }
     }
 
@@ -87,63 +111,24 @@ export default (localesRoot: string = "locales"): Plugin => {
   async function tranformLocale(
     content: string,
     filename: string,
-    transform: (s: string) => Promise<string>
+    hyphenate: boolean
   ) {
-    let basename = path.parse(filename).name;
-    if (basename === "en") {
-      basename = "en-us";
-    }
-    if (basename === "de") {
-      basename = "de-1996";
-    }
-    const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
-    const hypen = createHyphenator(patterns, { async: false, html: true });
+    const json = JSON.parse(content);
+    const code = `export default ${JSON.stringify(json)}`;
 
-    const traverse = (level: object) => {
-      const obj: Record<string, string | object> = {};
-      for (let [k, v] of Object.entries(level)) {
-        if (typeof v === "string") {
-          const h = hypen(v);
-          obj[k] = h;
-        } else if (typeof v === "object") {
-          obj[k] = traverse(v);
-        }
-      }
-
-      return obj;
-    };
-
-    const hyphenated = traverse(JSON.parse(content));
-
-    content = JSON.stringify(hyphenated);
-
-    const code = await transform(content);
-    const transformed = transformCode(code, { filename });
+    const transformed = await transformCode(code, hyphenate, { filename });
     return transformed;
   }
 
-  async function findLocale(basename: string) {
-    const filebase = path.resolve(localesRoot, basename);
-    for await (const [extname, transform] of Object.entries(transformers)) {
-      const filename = filebase + extname;
-
-      try {
-        const text = await fs.readFile(filename, { encoding: "utf-8" });
-        return tranformLocale(text, filename, transform);
-      } catch (error) {
-        // incase the file did not exist try next transformer
-        // otherwise propagate the error
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw error;
-        }
-      }
-    }
-
-    return null;
+  async function findLocale(filename: string, hyphenate: boolean) {
+    const absolutePath = path.resolve(localesRoot, filename);
+    console.log("ABSOLUTE PATH:", absolutePath, "FILENAME:", filename);
+    const text = await fs.readFile(absolutePath, { encoding: "utf-8" });
+    return tranformLocale(text, absolutePath, hyphenate);
   }
 
   return {
-    name: "svelte-intl-precompile", // required, will show up in warnings and errors
+    name: "@gigahatch/svelte-intl-precompile", // required, will show up in warnings and errors
 
     enforce: "pre",
     configureServer(server) {
@@ -155,18 +140,9 @@ export default (localesRoot: string = "locales"): Plugin => {
         if (pathStartsWith(file, localesRoot)) {
           // invalidate $locales/<locales><extname> modules
           const name = `${prefix}/${path.basename(file, path.extname(file))}`;
-
-          // Alltough we are normalizing the module names
-          // $locales/en.js -> $locales/en
-          // we check all configured extensions just to be sure
-          // '.js', '.ts', '.json', ..., and '' ($locales/en)
-          for (const extname of [...Object.keys(transformers), ""]) {
-            // check if locale file is in vite cache
-            const localeModule = moduleGraph.getModuleById(`${name}${extname}`);
-
-            if (localeModule) {
-              moduleGraph.invalidateModule(localeModule);
-            }
+          const localeModule = moduleGraph.getModuleById(name);
+          if (localeModule) {
+            moduleGraph.invalidateModule(localeModule);
           }
 
           // invalidate $locales module
@@ -180,25 +156,6 @@ export default (localesRoot: string = "locales"): Plugin => {
         }
       });
     },
-    resolveId(id) {
-      if (id === prefix || id.startsWith(`${prefix}/`)) {
-        const extname = path.extname(id);
-
-        // "normalize" module id to have no extension
-        // $locales/en.js -> $locales/en
-        // we do this as the extension is ignored
-        // when loading a locale
-        // we always try to find a locale file by its basename
-        // and adding an extension from transformers
-        // additionally this prevents loading the same module/locale
-        // several times with different extensions
-        const normalized = extname ? id.slice(0, -extname.length) : id;
-
-        return normalized;
-      }
-
-      return null;
-    },
     load(id) {
       // allow to auto register locales by calling registerAll from $locales module
       // import { registerAll, availableLocales } from '$locales'
@@ -207,25 +164,9 @@ export default (localesRoot: string = "locales"): Plugin => {
       }
 
       // import en from '$locales/en'
-      // import en from '$locales/en.js'
       if (id.startsWith(`${prefix}/`)) {
-        const extname = path.extname(id);
-
-        // $locales/en    -> en
-        // $locales/en.js -> en
-        // $locales/en.ts -> en
-        const locale = extname
-          ? id.slice(`${prefix}/`.length, -extname.length)
-          : id.slice(`${prefix}/`.length);
-        return findLocale(locale);
-      }
-
-      return null;
-    },
-    transform(content, id) {
-      // import locale from '../locales/en.js'
-      if (pathStartsWith(id, resolvedPath)) {
-        return tranformLocale(content, id, transformers[".json"]);
+        console.log("ID:", id, "BASENAME:", path.basename(id));
+        return findLocale(path.basename(id), hyphenate);
       }
 
       return null;
