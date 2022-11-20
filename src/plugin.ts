@@ -122,7 +122,6 @@ export default (
 
   async function findLocale(filename: string, hyphenate: boolean) {
     const absolutePath = path.resolve(localesRoot, filename);
-    console.log("ABSOLUTE PATH:", absolutePath, "FILENAME:", filename);
     const text = await fs.readFile(absolutePath, { encoding: "utf-8" });
     return tranformLocale(text, absolutePath, hyphenate);
   }
