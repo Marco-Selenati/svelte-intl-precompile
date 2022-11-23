@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import svelteIntlPrecompile from "../src/plugin";
+import type { PlatformPath } from "path";
 
 const enJsonTranslations = singleLineString`
 {
@@ -18,7 +19,7 @@ const translationFiles = {
 
 beforeEach(() => {
   vi.mock("path", async () => {
-    const path = await vi.importActual("path");
+    const path = await vi.importActual<PlatformPath>("path");
 
     return {
       ...path,

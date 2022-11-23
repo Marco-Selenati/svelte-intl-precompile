@@ -1,1 +1,7 @@
 /logos
+/tests
+/src
+/vitest.config.ts
+/tsconfig.json
+/.vscode
+/.github

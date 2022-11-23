@@ -2,50 +2,82 @@ import * as path from "path";
 import * as fs from "fs/promises";
 
 import * as babel from "@babel/core";
-import buildICUPlugin, {
-  PrecompileIntlOptions,
-} from "@gigahatch/babel-plugin-precompile-intl";
+import compiler from "./compiler.js";
 import pathStartsWith from "path-starts-with";
 import type { Plugin } from "vite";
 import createHyphenator, { HyphenationFunctionSync } from "hyphen";
 
-const intlPrecompiler = buildICUPlugin("@gigahatch/svelte-intl-precompile");
+import flatten from "flat";
+import { MessageFormatElement, parse } from "@formatjs/icu-messageformat-parser";
+
+async function getHyphenator(locale: string) {
+  if (locale === "en") {
+    locale = "en-us";
+  }
+  if (locale === "de") {
+    locale = "de-1996";
+  }
+
+  const patterns = (await import(`hyphen/patterns/${locale}.js`)).default;
+  return createHyphenator(patterns, {
+    async: false,
+    html: true,
+  }) as HyphenationFunctionSync;
+}
+
+function hyphenateAst(hyphenator: HyphenationFunctionSync, ast: MessageFormatElement[]) {
+  function recurse(ast: MessageFormatElement[]) {
+    for (const el of ast) {
+      switch (el.type) {
+        case 0: // literal
+          el.value = hyphenator(el.value) as string;
+          continue;
+
+        case 5: // select
+        case 6: // plural
+          for (const { value } of Object.values(el.options))
+          recurse(value);
+          continue;
+
+        case 8: // tag
+        recurse(el.children);
+          continue;
+
+        default:
+          continue;
+      }
+    }
+  }
+
+  recurse(ast);
+}
 
 export async function transformCode(
   code: string,
   hyphenate: boolean,
   options: Record<string, any>
 ): Promise<string | null | undefined> {
-  let opts: PrecompileIntlOptions = {};
+  const basename = path.parse(options["filename"]).name;
+  const hyphenator = await getHyphenator(basename);
 
-  if (hyphenate) {
-    let basename = path.parse(options["filename"]).name;
-    if (basename === "en") {
-      basename = "en-us";
+  const intlPrecompiler = compiler("@gigahatch/svelte-intl-precompile", (v) => {
+    const ast = parse(v, { ignoreTag: true });
+
+    if (hyphenate) {
+      hyphenateAst(hyphenator, ast);
     }
-    if (basename === "de") {
-      basename = "de-1996";
-    }
 
-    const patterns = (await import(`hyphen/patterns/${basename}.js`)).default;
-    const hyphen = createHyphenator(patterns, {
-      async: false,
-      html: true,
-    }) as HyphenationFunctionSync;
-
-    opts = {
-      literalTransform: hyphen,
-    };
-  }
+    return ast;
+  });
 
   return babel.transform(code, {
     ...options,
     generatorOpts: {
       jsescOption: {
-        minimal: true
+        minimal: true,
       },
     },
-    plugins: [[intlPrecompiler, opts]],
+    plugins: [intlPrecompiler],
   })?.code;
 }
 
@@ -114,8 +146,8 @@ export default (
     hyphenate: boolean
   ) {
     const json = JSON.parse(content);
-    const code = `export default ${JSON.stringify(json)}`;
-
+    const flattened = flatten<object, Record<string, string>>(json);
+    const code = `export default ${JSON.stringify(flattened)}`;
     const transformed = await transformCode(code, hyphenate, { filename });
     return transformed;
   }
@@ -155,7 +187,7 @@ export default (
         }
       });
     },
-    
+
     resolveId(id) {
       if (id === prefix || id.startsWith(`${prefix}/`)) return id;
       return null;

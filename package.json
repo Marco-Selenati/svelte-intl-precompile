@@ -3,18 +3,15 @@
   "version": "1.1.4",
   "description": "I18n library for Svelte.js that analyzes your keys at build time for max performance and minimal footprint",
   "type": "module",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dist/plugin": {
+    "./plugin": {
       "import": "./dist/plugin.js",
       "types": "./dist/plugin.d.ts"
-    },
-    "./package.json": "./package.json"
+    }
   },
   "sideEffects": false,
   "repository": {
@@ -37,18 +34,22 @@
   "author": "Gigahatch",
   "license": "ISC",
   "dependencies": {
-    "@gigahatch/babel-plugin-precompile-intl": "^1.0.0",
+    "@babel/core": "^7.20.2",
+    "@babel/helper-plugin-utils": "^7.20.2",
+    "@formatjs/icu-messageformat-parser": "^2.1.10",
     "@gigahatch/precompile-intl-runtime": "^1.0.1",
-    "path-starts-with": "^2.0.0"
+    "flat": "^5.0.2",
+    "path-starts-with": "^2.0.0",
+    "hyphen": "^1.6.4"
   },
   "devDependencies": {
+    "@babel/types": "^7.20.2",
     "@types/babel__core": "^7.1.19",
+    "@types/babel__helper-plugin-utils": "^7.10.0",
+    "@types/flat": "^5.0.2",
     "@types/hyphen": "^1.6.5",
     "@types/node": "^18.11.7",
     "typescript": "^4.8.4",
     "vitest": "^0.24.3"
-  },
-  "peerDependencies": {
-    "hyphen": "^1.6.4"
   }
 }
