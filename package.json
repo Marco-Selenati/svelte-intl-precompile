@@ -39,10 +39,10 @@
     "@babel/core": "^7.20.2",
     "@babel/helper-plugin-utils": "^7.20.2",
     "@formatjs/icu-messageformat-parser": "^2.1.10",
-    "@gigahatch/precompile-intl-runtime": "^1.0.1",
+    "@gigahatch/precompile-intl-runtime": "^1.1.0",
     "flat": "^5.0.2",
-    "path-starts-with": "^2.0.0",
-    "hyphen": "^1.6.4"
+    "hyphen": "^1.6.4",
+    "path-starts-with": "^2.0.0"
   },
   "devDependencies": {
     "@babel/types": "^7.20.2",

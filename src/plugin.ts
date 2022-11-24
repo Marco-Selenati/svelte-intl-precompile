@@ -8,7 +8,10 @@ import type { Plugin } from "vite";
 import createHyphenator, { HyphenationFunctionSync } from "hyphen";
 
 import flatten from "flat";
-import { MessageFormatElement, parse } from "@formatjs/icu-messageformat-parser";
+import {
+  MessageFormatElement,
+  parse,
+} from "@formatjs/icu-messageformat-parser";
 
 async function getHyphenator(locale: string) {
   if (locale === "en") {
@@ -25,7 +28,10 @@ async function getHyphenator(locale: string) {
   }) as HyphenationFunctionSync;
 }
 
-function hyphenateAst(hyphenator: HyphenationFunctionSync, ast: MessageFormatElement[]) {
+function hyphenateAst(
+  hyphenator: HyphenationFunctionSync,
+  ast: MessageFormatElement[]
+) {
   function recurse(ast: MessageFormatElement[]) {
     for (const el of ast) {
       switch (el.type) {
@@ -35,12 +41,11 @@ function hyphenateAst(hyphenator: HyphenationFunctionSync, ast: MessageFormatEle
 
         case 5: // select
         case 6: // plural
-          for (const { value } of Object.values(el.options))
-          recurse(value);
+          for (const { value } of Object.values(el.options)) recurse(value);
           continue;
 
         case 8: // tag
-        recurse(el.children);
+          recurse(el.children);
           continue;
 
         default:
@@ -50,6 +55,53 @@ function hyphenateAst(hyphenator: HyphenationFunctionSync, ast: MessageFormatEle
   }
 
   recurse(ast);
+}
+
+async function generateTypes(localesRoot: string) {
+  const translationKeys: string[][] = [];
+  for (const file of await fs.readdir(localesRoot)) {
+    translationKeys.push(
+      Object.keys(
+        flatten(
+          JSON.parse(
+            await fs.readFile(path.resolve(localesRoot, file), {
+              encoding: "utf-8",
+            })
+          )
+        )
+      )
+    );
+  }
+
+  let code: string[] = [];
+
+  if (translationKeys[0]) {
+    code.push("import type { TypedFormat } from '@gigahatch/svelte-intl-precompile';");
+    code.push("declare module '$locales' {");
+
+    const subsetKeys = translationKeys[0].filter((key) =>
+      translationKeys.every((keys) => keys.includes(key))
+    );
+    const typedef = `type TranslationKeys = ${subsetKeys
+      .map((v) => `"${v}"`)
+      .join("|")};`;
+
+    code.push(typedef);
+    code.push("export const t: TypedFormat<TranslationKeys>;");
+    code.push("export const registerAll: () => void;");
+    code.push("export const availableLocales: string[];");
+    code.push("}");
+  }
+
+  const filePath = path.resolve(
+    ".svelte-kit",
+    "types",
+    "src",
+    "svelte-intl-precompile",
+    "$types.d.ts"
+  );
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, code.join("\n"));
 }
 
 export async function transformCode(
@@ -90,6 +142,7 @@ export default (
   async function loadPrefixModule() {
     const code = [
       `import { register } from '@gigahatch/svelte-intl-precompile'`,
+      `export {__t as t} from '@gigahatch/svelte-intl-precompile';`,
       `export function registerAll() {`,
     ];
 
@@ -165,7 +218,7 @@ export default (
     configureServer(server) {
       const { ws, watcher, moduleGraph } = server;
       // listen to vite files watcher
-      watcher.on("change", (file) => {
+      watcher.on("change", async (file) => {
         file = path.relative("", file);
         // check if file changed is a locale
         if (pathStartsWith(file, localesRoot)) {
@@ -174,6 +227,7 @@ export default (
           const localeModule = moduleGraph.getModuleById(name);
           if (localeModule) {
             moduleGraph.invalidateModule(localeModule);
+            await generateTypes(localesRoot);
           }
 
           // invalidate $locales module
@@ -187,7 +241,9 @@ export default (
         }
       });
     },
-
+    buildStart() {
+      return generateTypes(localesRoot);
+    },
     resolveId(id) {
       if (id === prefix || id.startsWith(`${prefix}/`)) return id;
       return null;

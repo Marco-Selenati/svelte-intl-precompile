@@ -31,7 +31,7 @@ beforeEach(() => {
 
   vi.mock("fs/promises", () => ({
     readdir() {
-      return Promise.resolve().then(() => ["en-US.json", "en.json", "es.json"]);
+      return Promise.resolve().then(() => ["en.json", "es.json"]);
     },
     readFile(filename) {
       const content = translationFiles[filename];
@@ -40,6 +40,8 @@ beforeEach(() => {
       (error as any).code = "ENOENT";
       throw error;
     },
+    mkdir() {return;},
+    writeFile() {return;},
   }));
 });
 
@@ -53,12 +55,12 @@ describe("imports", () => {
     const content = await plugin.load("$locales");
     expect(content).toBe(singleLineString`
     import { register } from '@gigahatch/svelte-intl-precompile'
+    export {__t as t} from '@gigahatch/svelte-intl-precompile';
     export function registerAll() {
-      register("en-US", () => import("$locales/en-US"))
       register("en", () => import("$locales/en"))
       register("es", () => import("$locales/es"))
     }
-    export const availableLocales = ["en","es","en-US"]`);
+    export const availableLocales = ["en","es"]`);
   });
 
   it("`$locales/en.json` returns the translations for that language", async () => {
