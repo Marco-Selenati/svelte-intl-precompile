@@ -10,9 +10,11 @@
     },
     "./plugin": {
       "import": "./dist/plugin.js",
-      "types": "./dist/plugin.d.ts"
+      "types": "./dist/plugin.d.ts" 
     }
   },
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
