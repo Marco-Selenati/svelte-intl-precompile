@@ -82,7 +82,7 @@ async function generateTypes(localesRoot: string) {
     const subsetKeys = translationKeys[0].filter((key) =>
       translationKeys.every((keys) => keys.includes(key))
     );
-    const typedef = `type TranslationKeys = ${subsetKeys
+    const typedef = `export type TranslationKeys = ${subsetKeys
       .map((v) => `"${v}"`)
       .join("|")};`;
 
