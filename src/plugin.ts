@@ -57,7 +57,10 @@ function hyphenateAst(
   recurse(ast);
 }
 
-async function generateTypes(localesRoot: string) {
+async function generateTypes(
+  localesRoot: string,
+  translationKey: TranslationKey
+) {
   const translationKeys: string[][] = [];
   for (const file of await fs.readdir(localesRoot)) {
     translationKeys.push(
@@ -76,12 +79,19 @@ async function generateTypes(localesRoot: string) {
   let code: string[] = [];
 
   if (translationKeys[0]) {
-    code.push("import type { TypedFormat } from '@gigahatch/svelte-intl-precompile';");
+    code.push(
+      "import type { TypedFormat } from '@gigahatch/svelte-intl-precompile';"
+    );
     code.push("declare module '$locales' {");
 
-    const subsetKeys = translationKeys[0].filter((key) =>
-      translationKeys.every((keys) => keys.includes(key))
-    );
+    let subsetKeys: string[];
+    if (translationKey === "KeysContainedInAllLanguages") {
+      subsetKeys = translationKeys[0].filter((key) =>
+        translationKeys.every((keys) => keys.includes(key))
+      );
+    } else {
+      subsetKeys = translationKeys.flat();
+    }
     const typedef = `export type TranslationKeys = ${subsetKeys
       .map((v) => `"${v}"`)
       .join("|")};`;
@@ -133,9 +143,14 @@ export async function transformCode(
   })?.code;
 }
 
+export type TranslationKey =
+  | "everyKeyInEveryLanugage"
+  | "KeysContainedInAllLanguages";
+
 export default (
   localesRoot: string = "locales",
-  hyphenate: boolean = false
+  hyphenate: boolean = false,
+  translationKey: TranslationKey = "KeysContainedInAllLanguages"
 ): Plugin => {
   const prefix = "$locales";
 
@@ -227,7 +242,7 @@ export default (
           const localeModule = moduleGraph.getModuleById(name);
           if (localeModule) {
             moduleGraph.invalidateModule(localeModule);
-            await generateTypes(localesRoot);
+            await generateTypes(localesRoot, translationKey);
           }
 
           // invalidate $locales module
@@ -242,7 +257,7 @@ export default (
       });
     },
     buildStart() {
-      return generateTypes(localesRoot);
+      return generateTypes(localesRoot, translationKey);
     },
     resolveId(id) {
       if (id === prefix || id.startsWith(`${prefix}/`)) return id;
