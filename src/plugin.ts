@@ -144,7 +144,7 @@ export async function transformCode(
 }
 
 export type TranslationKey =
-  | "everyKeyInEveryLanugage"
+  | "EveryKeyInEveryLanguage"
   | "KeysContainedInAllLanguages";
 
 export default (
