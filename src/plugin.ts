@@ -182,9 +182,9 @@ export default (
         availableLocales.push(locale);
 
         code.push(
-          `  register(${JSON.stringify(locale)}, () => import(${JSON.stringify(
+          `  register(${JSON.stringify(locale)}, [() => import(${JSON.stringify(
             `${prefix}/${locale}`
-          )}))`
+          )})])`
         );
       }
     }

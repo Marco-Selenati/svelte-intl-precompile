@@ -25,7 +25,7 @@ beforeEach(() => {
       ...path,
       resolve(...paths) {
         return ["fakeroot", ...paths].join("/");
-      }
+      },
     };
   });
 
@@ -40,8 +40,12 @@ beforeEach(() => {
       (error as any).code = "ENOENT";
       throw error;
     },
-    mkdir() {return;},
-    writeFile() {return;},
+    mkdir() {
+      return;
+    },
+    writeFile() {
+      return;
+    },
   }));
 });
 
@@ -57,8 +61,8 @@ describe("imports", () => {
     import { register } from '@gigahatch/svelte-intl-precompile'
     export {__t as t} from '@gigahatch/svelte-intl-precompile';
     export function registerAll() {
-      register("en", () => import("$locales/en"))
-      register("es", () => import("$locales/es"))
+      register("en", [() => import("$locales/en")])
+      register("es", [() => import("$locales/es")])
     }
     export const availableLocales = ["en","es"]`);
   });

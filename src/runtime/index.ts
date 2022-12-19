@@ -1,4 +1,3 @@
-import { flush } from "./includes/loaderQueue.js";
 import { getOptions, getCurrentLocale } from "./includes/utils.js";
 export * from "./includes/localeGetters.js";
 export * from "./includes/utils.js";
@@ -12,9 +11,9 @@ export {
   $locales as locales,
   addMessages,
 } from "./stores/instanceState.js";
-export { register } from "./includes/loaderQueue";
-export { $isLoading as isLoading } from "./stores/instanceState.js";
-import { formatTime, formatDate, formatNumber } from "./stores/formatters";
+export { register } from "./stores/instanceState.js";
+import { formatTime, formatDate, formatNumber } from "./stores/formatters.js";
+import { flush } from "./stores/instanceState.js";
 import type { IntlFormatterOptions } from "./types";
 export {
   formatMessage,
@@ -23,7 +22,7 @@ export {
   $formatNumber as number,
   $formatTime as time,
   $getJSON as json,
-} from "./stores/formatters";
+} from "./stores/formatters.js";
 export {
   getDateFormatter,
   getNumberFormatter,
@@ -31,7 +30,7 @@ export {
   setCustomDateFormat,
   setCustomNumberFormat,
   setCustomTimeFormat,
-} from "./includes/formatters";
+} from "./includes/formatters.js";
 
 type PluralRule = "z" | "o" | "t" | "f" | "m" | "h" | number;
 export type PluralOptions = Partial<Record<PluralRule, string>>;

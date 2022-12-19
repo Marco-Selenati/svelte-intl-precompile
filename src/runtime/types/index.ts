@@ -1,8 +1,5 @@
 import type { Readable } from "svelte/store";
 
-export interface DeepDictionary {
-  [key: string]: DeepDictionary | string | string[];
-}
 export type LocaleDictionaryValue = string | ((...args: any[]) => string);
 export type LocaleDictionary = Record<string, LocaleDictionaryValue>;
 export type Dictionary = Record<string, LocaleDictionary>;
@@ -49,9 +46,6 @@ export type IntlFormatterOptions<T> = T & {
   locale?: string;
 };
 
-export interface MessagesLoader {
-  (): Promise<any>;
-}
 export interface GetClientLocaleOptions {
   navigator?: boolean;
   hash?: string;

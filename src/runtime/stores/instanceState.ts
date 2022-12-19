@@ -1,13 +1,34 @@
-import { flush, hasLocaleQueue } from "../includes/loaderQueue";
 import { getCurrentLocale, setCurrentLocale } from "../includes/utils";
 import { writable, derived } from "svelte/store";
 import type {
   LocaleDictionary,
-  DeepDictionary,
   Dictionary,
   LocaleDictionaryValue,
 } from "../types/index";
 import { getPossibleLocales } from "../includes/utils";
+
+export type NestedTranslations =
+  | string
+  | Function
+  | { [Key: string]: NestedTranslations };
+
+export interface MessagesLoader {
+  (): Promise<{ default: NestedTranslations }>;
+}
+
+const registeredLocaleGroups: Record<string, MessagesLoader[]> = {};
+
+// Wait for the specified localeGroup to be ready to be rendered
+export async function flush(groupName: string): Promise<void> {
+  const promises = registeredLocaleGroups[groupName].map((lg) => lg());
+  const group = await Promise.all(promises);
+  addMessages(groupName, ...group.map((g) => g.default));
+}
+
+// Add a localeGroup with a function that resolves to the translations
+export function register(groupName: string, loader: MessagesLoader[]) {
+  registeredLocaleGroups[groupName] = loader;
+}
 
 const $locale = writable("");
 
@@ -23,7 +44,7 @@ $locale.subscribe((newLocale: string) => {
 
 const localeSet = $locale.set;
 $locale.set = (newLocale: string): void | Promise<void> => {
-  if (getClosestAvailableLocale(newLocale) && hasLocaleQueue(newLocale)) {
+  if (getClosestAvailableLocale(newLocale)) {
     return flush(newLocale).then(() => localeSet(newLocale));
   }
   return localeSet(newLocale);
@@ -93,7 +114,7 @@ export function getClosestAvailableLocale(refLocale: string): string | null {
   return null;
 }
 
-export function addMessages(locale: string, ...partials: DeepDictionary[]) {
+export function addMessages(locale: string, ...partials: NestedTranslations[]) {
   $dictionary.update((d) => {
     d[locale] = Object.assign(d[locale] ?? {}, ...partials);
     return d;
@@ -104,8 +125,6 @@ const $locales = /*@__PURE__*/ derived([$dictionary], ([$dictionary]) =>
   Object.keys($dictionary)
 );
 $dictionary.subscribe((newDictionary) => (dictionary = newDictionary));
-
-export const $isLoading = writable(false);
 
 export { $locale };
 
