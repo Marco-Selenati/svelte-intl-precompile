@@ -1,6 +1,5 @@
 import type { MemoizedIntlFormatter } from "../types/index";
 import { getCurrentLocale } from "./utils";
-import { monadicMemoize } from "./memoize";
 
 const defaultNumber: Record<string, Intl.NumberFormatOptions> = {
   scientific: { notation: "scientific" },
@@ -58,7 +57,7 @@ let customTime: Record<string, Intl.DateTimeFormatOptions> = {};
 export const getNumberFormatter: MemoizedIntlFormatter<
   Intl.NumberFormat,
   Intl.NumberFormatOptions
-> = monadicMemoize(({ locale, format, ...options } = {}) => {
+> = ({ locale, format, ...options } = {}) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -74,12 +73,12 @@ export const getNumberFormatter: MemoizedIntlFormatter<
   } else {
     return new Intl.NumberFormat(locale, options);
   }
-});
+};
 
 export const getDateFormatter: MemoizedIntlFormatter<
   Intl.DateTimeFormat,
   Intl.DateTimeFormatOptions
-> = monadicMemoize(({ locale, format, ...options } = {}) => {
+> = ({ locale, format, ...options } = {}) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -96,12 +95,12 @@ export const getDateFormatter: MemoizedIntlFormatter<
   }
 
   return new Intl.DateTimeFormat(locale, options);
-});
+};
 
 export const getTimeFormatter: MemoizedIntlFormatter<
   Intl.DateTimeFormat,
   Intl.DateTimeFormatOptions
-> = monadicMemoize(({ locale, format, ...options } = {}) => {
+> = ({ locale, format, ...options } = {}) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -118,4 +117,4 @@ export const getTimeFormatter: MemoizedIntlFormatter<
   }
 
   return new Intl.DateTimeFormat(locale, options);
-});
+};
