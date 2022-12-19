@@ -3,7 +3,6 @@ import * as fs from "fs/promises";
 
 import * as babel from "@babel/core";
 import compiler from "./compiler.js";
-import pathStartsWith from "path-starts-with";
 import type { Plugin } from "vite";
 import createHyphenator, { HyphenationFunctionSync } from "hyphen";
 
@@ -236,7 +235,8 @@ export default (
       watcher.on("change", async (file) => {
         file = path.relative("", file);
         // check if file changed is a locale
-        if (pathStartsWith(file, localesRoot)) {
+
+        if (file.startsWith(localesRoot)) {
           // invalidate $locales/<locales><extname> modules
           const name = `${prefix}/${path.basename(file, path.extname(file))}`;
           const localeModule = moduleGraph.getModuleById(name);

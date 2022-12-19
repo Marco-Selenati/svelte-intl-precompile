@@ -10,7 +10,6 @@ export default defineConfig({
       formats: ["es"],
       entry: {
         index: resolve(__dirname, "src/index.ts"),
-        plugin: resolve(__dirname, "src/plugin.ts"),
       },
     },
   },

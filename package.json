@@ -19,7 +19,7 @@
     "url": "https://github.com/gigahatch/svelte-intl-precompile"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc --project tsconfig.json",
     "postbuild": "cp src/locales.d.ts dist/locales.d.ts",
     "test": "cross-env TZ=utc vitest",
     "coverage": "vitest run --coverage",
@@ -38,8 +38,7 @@
     "@babel/helper-plugin-utils": "^7.20.2",
     "@formatjs/icu-messageformat-parser": "^2.1.14",
     "flat": "^5.0.2",
-    "hyphen": "^1.6.4",
-    "path-starts-with": "^2.0.0"
+    "hyphen": "^1.6.4"
   },
   "devDependencies": {
     "@babel/types": "^7.20.5",
