@@ -1,4 +1,4 @@
-import { getCurrentLocale, setCurrentLocale } from "../includes/utils";
+import { setCurrentLocale } from "../includes/utils";
 import { writable, derived, readable, Subscriber } from "svelte/store";
 import type {
   LocaleDictionary,

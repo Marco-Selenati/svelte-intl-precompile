@@ -1,13 +1,14 @@
 import { getCurrentLocale } from "./includes/utils.js";
 export * from "./includes/localeGetters.js";
 export * from "./includes/utils.js";
-export { $locale as locale } from "./stores/instanceState.js";
 export {
   $dictionary as dictionary,
   $locales as locales,
   addMessages,
+  $locale as locale,
+  register,
+  changeLocale,
 } from "./stores/instanceState.js";
-export { register, changeLocale } from "./stores/instanceState.js";
 import { formatTime, formatDate, formatNumber } from "./stores/formatters.js";
 import type { IntlFormatterOptions } from "./types";
 export {
