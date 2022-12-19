@@ -21,7 +21,7 @@ export { registerLocaleLoader as register } from "./includes/loaderQueue";
 export { $isLoading as isLoading } from "./stores/loading";
 
 import { formatTime, formatDate, formatNumber } from "./stores/formatters";
-import { IntlFormatterOptions } from "./types";
+import type { IntlFormatterOptions } from "./types";
 export {
   formatMessage,
   $format as __t,
@@ -90,4 +90,4 @@ export function __time(value: Date, format = "short"): string {
   return formatTime(getCurrentLocale(), value, { format });
 }
 
-export { TypedFormat } from "./types";
+export type { TypedFormat } from "./types";

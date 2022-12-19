@@ -1,5 +1,5 @@
 import { derived } from "svelte/store";
-import {
+import type {
   MessageFormatter,
   TimeFormatter,
   DateFormatter,

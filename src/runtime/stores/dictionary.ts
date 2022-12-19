@@ -1,6 +1,6 @@
 // @ts-ignore
 import { writable, derived } from "svelte/store";
-import {
+import type {
   LocaleDictionary,
   LocaleDictionaryValue,
   DeepDictionary,

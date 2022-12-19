@@ -1,4 +1,4 @@
-import { MemoizedIntlFormatter } from "../types/index";
+import type { MemoizedIntlFormatter } from "../types/index";
 import { getCurrentLocale } from "./utils";
 import { monadicMemoize } from "./memoize";
 

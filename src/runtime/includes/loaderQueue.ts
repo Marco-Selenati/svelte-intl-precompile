@@ -1,4 +1,4 @@
-import { MessagesLoader } from "../types/index";
+import type { MessagesLoader } from "../types/index";
 import {
   hasLocaleDictionary,
   $dictionary,
