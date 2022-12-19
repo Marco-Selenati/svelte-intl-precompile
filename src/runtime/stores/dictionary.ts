@@ -2,9 +2,9 @@
 import { writable, derived } from "svelte/store";
 import type {
   LocaleDictionary,
-  LocaleDictionaryValue,
   DeepDictionary,
   Dictionary,
+  LocaleDictionaryValue,
 } from "../types/index";
 import { getPossibleLocales } from "../includes/utils";
 
@@ -33,10 +33,14 @@ export function getMessageFromDictionary(locale: string, id: string) {
     const ids = id.split(".");
     let tmpDict: any = localeDictionary;
     for (let i = 0; i < ids.length; i++) {
-      if (typeof tmpDict[ids[i]] !== "object") {
-        return (tmpDict[ids[i]] as LocaleDictionaryValue) || null;
+      const idPart = ids[i];
+      if (idPart === undefined) {
+        return null;
       }
-      tmpDict = tmpDict[ids[i]];
+      if (typeof tmpDict[idPart] !== "object") {
+        return (tmpDict[idPart] as LocaleDictionaryValue) || null;
+      }
+      tmpDict = tmpDict[idPart];
     }
   }
   return null;
@@ -49,6 +53,9 @@ export function getClosestAvailableLocale(refLocale: string): string | null {
 
   for (let i = 0; i < relatedLocales.length; i++) {
     const locale = relatedLocales[i];
+    if (locale === undefined) {
+      return null;
+    }
 
     if (hasLocaleDictionary(locale)) {
       return locale;
@@ -60,7 +67,7 @@ export function getClosestAvailableLocale(refLocale: string): string | null {
 
 export function addMessages(locale: string, ...partials: DeepDictionary[]) {
   $dictionary.update((d) => {
-    d[locale] = Object.assign(d[locale] || {}, ...partials);
+    d[locale] = Object.assign(d[locale] ?? {}, ...partials);
     return d;
   });
 }
