@@ -16,10 +16,6 @@ export function resetQueues() {
   });
 }
 
-function createLocaleQueue(locale: string) {
-  loaderQueue[locale] = new Set();
-}
-
 function removeLocaleFromQueue(locale: string) {
   delete loaderQueue[locale];
 }
@@ -76,11 +72,14 @@ export function flush(locale: string) {
 }
 
 export function registerLocaleLoader(locale: string, loader: MessagesLoader) {
-  if (!getLocaleQueue(locale)) createLocaleQueue(locale);
+  let queue = getLocaleQueue(locale);
 
-  const queue = getLocaleQueue(locale);
-  // istanbul ignore if
-  if (getLocaleQueue(locale).has(loader)) return;
+  if (queue === undefined) {
+    queue = new Set();
+    loaderQueue[locale] = queue;
+  } else if (queue.has(loader)) {
+    return;
+  }
 
   if (!hasLocaleDictionary(locale)) {
     $dictionary.update((d) => {
