@@ -70,11 +70,11 @@ export function __number(
   return formatNumber(getCurrentLocale(), value, format);
 }
 
-export function __date(value: Date, format: string): string {
+export function __date(value: Date, format?: string): string {
   return formatDate(getCurrentLocale(), value, format);
 }
 
-export function __time(value: Date, format: string): string {
+export function __time(value: Date, format?: string): string {
   return formatTime(getCurrentLocale(), value, format);
 }
 
