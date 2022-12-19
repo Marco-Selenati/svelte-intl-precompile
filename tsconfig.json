@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
 
     // Strictness and quality settings.
@@ -21,6 +21,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
+    "allowJs": false,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
 
     // Type-checking settings.
     "lib": ["ES2020", "DOM"],
