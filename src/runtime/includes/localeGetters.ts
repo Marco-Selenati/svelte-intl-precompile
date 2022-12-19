@@ -41,11 +41,15 @@ export const getLocaleFromAcceptLanguageHeader = (
       const directives = locale.split(";q=");
       const l = directives[0];
       const quality = directives[1];
-      if (l !== undefined && quality !== undefined) {
+      if (l !== undefined) {
+        let q = 1.0;
+        if (quality !== undefined) {
+          q = parseFloat(quality);
+        }
         return [
           {
             locale: l,
-            quality: parseFloat(quality) || 1.0,
+            quality: q,
           },
         ];
       } else {
