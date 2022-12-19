@@ -13,15 +13,13 @@
       "types": "./dist/plugin.d.ts"
     }
   },
-  "types": "dist/index.d.ts",
-  "module": "dist/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/gigahatch/svelte-intl-precompile"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "vite build",
     "postbuild": "cp src/locales.d.ts dist/locales.d.ts",
     "test": "cross-env TZ=utc vitest",
     "coverage": "vitest run --coverage",
@@ -52,7 +50,9 @@
     "@types/node": "^18.11.17",
     "cross-env": "^7.0.3",
     "typescript": "^4.9.4",
-    "vitest": "^0.24.5"
+    "vitest": "^0.24.5",
+    "vite": "^4.0.2",
+    "vite-plugin-dts": "^1.7.1"
   },
   "peerDependencies": {
     "svelte": "^3.53.1"
