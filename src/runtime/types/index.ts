@@ -57,7 +57,6 @@ export interface GetClientLocaleOptions {
 export interface ConfigureOptions {
   fallbackLocale: string;
   initialLocale?: string;
-  loadingDelay?: number;
 }
 
 export type TypedFormat<T = string> = Readable<

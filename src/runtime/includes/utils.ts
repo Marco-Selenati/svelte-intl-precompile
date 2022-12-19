@@ -1,13 +1,11 @@
 interface Options {
   fallbackLocale: string;
   initialLocale: string;
-  loadingDelay: number;
 }
 
 const defaultOptions: Options = {
   fallbackLocale: "",
   initialLocale: "",
-  loadingDelay: 200,
 };
 
 const options: Options = defaultOptions;
