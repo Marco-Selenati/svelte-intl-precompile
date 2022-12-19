@@ -29,29 +29,25 @@ export type MessageFormatter<T = string> = (
 export type TimeFormatter = (
   currentLocale: string,
   d: Date | number,
-  options?: IntlFormatterOptions<Intl.DateTimeFormatOptions>
+  options: string | Intl.DateTimeFormatOptions | undefined
 ) => string;
 
 export type DateFormatter = (
   currentLocale: string,
   d: Date | number,
-  options?: IntlFormatterOptions<Intl.DateTimeFormatOptions>
+  options: string | Intl.DateTimeFormatOptions | undefined
 ) => string;
 
 export type NumberFormatter = (
   currentLocale: string,
   d: number,
-  options?: IntlFormatterOptions<Intl.NumberFormatOptions>
+  options: string | Intl.NumberFormatOptions | undefined
 ) => string;
 
 export type IntlFormatterOptions<T> = T & {
   format?: string;
   locale?: string;
 };
-
-export interface MemoizedIntlFormatter<T, U> {
-  (options?: IntlFormatterOptions<U>): T;
-}
 
 export interface MessagesLoader {
   (): Promise<any>;

@@ -59,17 +59,17 @@ export const getJSON: JsonGetter = (id, locale) => {
 
 export const formatTime: TimeFormatter = (currentLocale, t, options) => {
   const locale = currentLocale || getCurrentLocale();
-  return getTimeFormatter({ locale, ...options }).format(t);
+  return getTimeFormatter(locale, options).format(t);
 };
 
 export const formatDate: DateFormatter = (currentLocale, d, options) => {
   const locale = currentLocale || getCurrentLocale();
-  return getDateFormatter({ locale, ...options }).format(d);
+  return getDateFormatter(locale, options).format(d);
 };
 
 export const formatNumber: NumberFormatter = (currentLocale, n, options) => {
   const locale = currentLocale || getCurrentLocale();
-  return getNumberFormatter({ locale, ...options }).format(n);
+  return getNumberFormatter(locale, options).format(n);
 };
 
 export const $format: TypedFormat = /*@__PURE__*/ derived(

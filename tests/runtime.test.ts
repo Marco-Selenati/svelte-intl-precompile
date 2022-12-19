@@ -345,7 +345,7 @@ describe("time", function () {
           minute: "numeric",
         }).format(wedding)
       );
-      expect(format(wedding, { format: "full" })).toBe(
+      expect(format(wedding, "full")).toBe(
         new Intl.DateTimeFormat("en-US", {
           hour: "numeric",
           minute: "numeric",
@@ -363,9 +363,7 @@ describe("date", function () {
   it("formats the given date in the current locale with the given style (if any)", () => {
     let unsubscribe = date.subscribe((format) => {
       expect(format(wedding)).toBe("12/18/13");
-      expect(format(wedding, { format: "full" })).toBe(
-        "Wednesday, December 18, 2013"
-      );
+      expect(format(wedding, "full")).toBe("Wednesday, December 18, 2013");
     });
     unsubscribe();
   });
@@ -376,7 +374,7 @@ describe("number", function () {
   it("formats the given number in the current locale with the given style (if any)", () => {
     let unsubscribe = number.subscribe((format) => {
       expect(format(num)).toBe("123,456.789");
-      expect(format(num, { format: "eur" })).toBe("€123,456.79");
+      expect(format(num, "eur")).toBe("€123,456.79");
     });
     unsubscribe();
   });

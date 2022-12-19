@@ -75,19 +75,15 @@ export function __number(
   value: number,
   format?: string | IntlFormatterOptions<Intl.NumberFormatOptions>
 ): string {
-  return formatNumber(
-    getCurrentLocale(),
-    value,
-    typeof format === "string" ? { format } : format
-  );
+  return formatNumber(getCurrentLocale(), value, format);
 }
 
-export function __date(value: Date, format = "short"): string {
-  return formatDate(getCurrentLocale(), value, { format });
+export function __date(value: Date, format: string): string {
+  return formatDate(getCurrentLocale(), value, format);
 }
 
-export function __time(value: Date, format = "short"): string {
-  return formatTime(getCurrentLocale(), value, { format });
+export function __time(value: Date, format: string): string {
+  return formatTime(getCurrentLocale(), value, format);
 }
 
 export type { TypedFormat } from "./types";

@@ -1,4 +1,3 @@
-import type { MemoizedIntlFormatter } from "../types/index";
 import { getCurrentLocale } from "./utils";
 
 const defaultNumber: Record<string, Intl.NumberFormatOptions> = {
@@ -54,10 +53,10 @@ let customNumber: Record<string, Intl.NumberFormatOptions> = {};
 let customDate: Record<string, Intl.DateTimeFormatOptions> = {};
 let customTime: Record<string, Intl.DateTimeFormatOptions> = {};
 
-export const getNumberFormatter: MemoizedIntlFormatter<
-  Intl.NumberFormat,
-  Intl.NumberFormatOptions
-> = ({ locale, format, ...options } = {}) => {
+export const getNumberFormatter = (
+  locale: string,
+  format: string | Intl.NumberFormatOptions | undefined
+) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -65,20 +64,23 @@ export const getNumberFormatter: MemoizedIntlFormatter<
     );
   }
 
+  const formats = Object.assign({}, defaultNumber, customNumber);
+
   if (typeof format === "string") {
-    return new Intl.NumberFormat(
-      locale,
-      Object.assign({}, defaultNumber, customNumber)[format]
-    );
-  } else {
-    return new Intl.NumberFormat(locale, options);
+    format = formats[format];
   }
+
+  if (format === undefined) {
+    format = formats["short"];
+  }
+
+  return new Intl.NumberFormat(locale, format);
 };
 
-export const getDateFormatter: MemoizedIntlFormatter<
-  Intl.DateTimeFormat,
-  Intl.DateTimeFormatOptions
-> = ({ locale, format, ...options } = {}) => {
+export const getDateFormatter = (
+  locale: string,
+  format: string | Intl.DateTimeFormatOptions | undefined
+) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -88,19 +90,21 @@ export const getDateFormatter: MemoizedIntlFormatter<
 
   const formats = Object.assign({}, defaultDate, customDate);
 
-  if (format) {
-    options = formats[format];
-  } else if (Object.keys(options).length === 0) {
-    options = formats["short"];
+  if (typeof format === "string") {
+    format = formats[format];
   }
 
-  return new Intl.DateTimeFormat(locale, options);
+  if (format === undefined) {
+    format = formats["short"];
+  }
+
+  return new Intl.DateTimeFormat(locale, format);
 };
 
-export const getTimeFormatter: MemoizedIntlFormatter<
-  Intl.DateTimeFormat,
-  Intl.DateTimeFormatOptions
-> = ({ locale, format, ...options } = {}) => {
+export const getTimeFormatter = (
+  locale: string,
+  format: string | Intl.DateTimeFormatOptions | undefined
+) => {
   locale = locale || getCurrentLocale();
   if (locale == null) {
     throw new Error(
@@ -110,11 +114,13 @@ export const getTimeFormatter: MemoizedIntlFormatter<
 
   const formats = Object.assign({}, defaultTime, customTime);
 
-  if (format) {
-    options = formats[format];
-  } else if (Object.keys(options).length === 0) {
-    options = formats["short"];
+  if (typeof format === "string") {
+    format = formats[format];
   }
 
-  return new Intl.DateTimeFormat(locale, options);
+  if (format === undefined) {
+    format = formats["short"];
+  }
+
+  return new Intl.DateTimeFormat(locale, format);
 };
