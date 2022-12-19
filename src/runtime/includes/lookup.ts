@@ -1,21 +1,12 @@
 import { getMessageFromDictionary } from "../stores/instanceState.js";
-import { getPossibleLocales } from "./utils.js";
 
-export const lookup = (path: string, refLocale: string) => {
-  if (refLocale == null) return undefined;
+export const lookup = (path: string, localeGroup: string) => {
+  if (localeGroup == null) return undefined;
 
-  const locales = getPossibleLocales(refLocale);
+  const message = getMessageFromDictionary(localeGroup, path);
 
-  for (let i = 0; i < locales.length; i++) {
-    const locale = locales[i];
-    if (locale === undefined) {
-      continue;
-    }
-    const message = getMessageFromDictionary(locale, path);
-
-    if (message) {
-      return message;
-    }
+  if (message) {
+    return message;
   }
 
   return undefined;

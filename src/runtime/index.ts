@@ -1,19 +1,14 @@
-import { getOptions, getCurrentLocale } from "./includes/utils.js";
+import { getCurrentLocale } from "./includes/utils.js";
 export * from "./includes/localeGetters.js";
 export * from "./includes/utils.js";
-export function waitLocale(locale?: string) {
-  return flush(locale || getCurrentLocale() || getOptions().initialLocale);
-}
-export { init } from "./configs";
 export { $locale as locale } from "./stores/instanceState.js";
 export {
   $dictionary as dictionary,
   $locales as locales,
   addMessages,
 } from "./stores/instanceState.js";
-export { register } from "./stores/instanceState.js";
+export { register, changeLocale } from "./stores/instanceState.js";
 import { formatTime, formatDate, formatNumber } from "./stores/formatters.js";
-import { flush } from "./stores/instanceState.js";
 import type { IntlFormatterOptions } from "./types";
 export {
   formatMessage,

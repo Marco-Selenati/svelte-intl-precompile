@@ -10,7 +10,6 @@ import {
   locale,
   dictionary,
   locales,
-  init,
   __t as format,
   time,
   date,
@@ -20,6 +19,7 @@ import {
   setCustomDateFormat,
   setCustomTimeFormat,
   setCustomNumberFormat,
+  changeLocale,
 } from "../src/index";
 import { describe, it, expect, beforeEach } from "vitest";
 
@@ -30,8 +30,8 @@ describe("Timezones", () => {
   });
 });
 
-beforeEach(() => {
-  locale.set(undefined as unknown as string);
+beforeEach(async () => {
+  await changeLocale("en-US");
   dictionary.set({});
   setCustomDateFormat({
     "abbr-full": { weekday: "long", month: "short", day: "numeric" },
@@ -41,10 +41,6 @@ beforeEach(() => {
   });
   setCustomNumberFormat({
     eur: { style: "currency", currency: "EUR" },
-  });
-  init({
-    fallbackLocale: "en",
-    initialLocale: "en-US", // in node by default only the en-US language is available.
   });
 });
 
@@ -59,9 +55,9 @@ describe("__interpolate", function () {
   });
 });
 
-describe("__plural", function () {
-  it("works respecting the pluralization rules of the current locale", () => {
-    locale.set("en-US");
+describe("__plural", async function () {
+  it("works respecting the pluralization rules of the current locale", async () => {
+    await changeLocale("en-US");
     let pluralizations: PluralOptions = {
       z: "no cats",
       o: "one cat",
@@ -79,7 +75,7 @@ describe("__plural", function () {
     expect(__plural(18, pluralizations)).toBe("other cats");
     expect(__plural(200, pluralizations)).toBe("other cats");
 
-    locale.set("ar-EG"); // arabic has a lot of different categories for
+    await changeLocale("ar-EG"); // arabic has a lot of different categories for
     expect(__plural(0, pluralizations)).toBe("no cats");
     expect(__plural(1, pluralizations)).toBe("one cat");
     expect(__plural(2, pluralizations)).toBe("a couple cats");
@@ -140,11 +136,11 @@ describe("__date", function () {
     expect(__date(wedding, "abbr-full")).toBe("Friday, Oct 18");
   });
 
-  it("honours current locale setting", function () {
+  it("honours current locale setting", async function () {
     let disaster = new Date("1986-01-28");
-    locale.set("en");
+    await changeLocale("en");
     expect(__date(disaster)).toBe("1/28/86");
-    locale.set("de");
+    await changeLocale("de");
     expect(__date(disaster)).toBe("28.1.86");
   });
 });
@@ -200,22 +196,22 @@ describe("__time", function () {
     );
   });
 
-  it("honours current locale setting", function () {
+  it("honours current locale setting", async function () {
     let wedding = new Date(Date.UTC(2013, 11, 18, 19, 13, 50));
     expect(__time(wedding, "hour")).toBe(
       new Intl.DateTimeFormat("en-US", { hour: "numeric" }).format(wedding)
     );
-    locale.set("de");
+    await changeLocale("de");
     expect(__time(wedding, "hour")).toBe(
       new Intl.DateTimeFormat("de", { hour: "numeric" }).format(wedding)
     );
   });
 });
 
-describe("__number", function () {
-  it("formats numbers in the current's locale way", function () {
+describe("__number", async function () {
+  it("formats numbers in the current's locale way", async function () {
     expect(__number(12345678)).toBe("12,345,678");
-    locale.set("de");
+    await changeLocale("de");
     expect(__number(12345678)).toBe("12.345.678");
   });
 
@@ -261,8 +257,8 @@ describe("__number", function () {
   });
 });
 
-describe("locale", function () {
-  it("subscribes get notified when its value is updated", () => {
+describe("locale", async function () {
+  it("subscribes get notified when its value is updated", async () => {
     expect.assertions(2);
     let earlyExit = true;
     let unsubscribe = locale.subscribe((locale) => {
@@ -274,7 +270,7 @@ describe("locale", function () {
       expect(locale).toBe("es-ES");
     });
     earlyExit = false;
-    locale.set("es-ES");
+    await changeLocale("es-ES");
     unsubscribe();
     unsubscribe2();
   });
