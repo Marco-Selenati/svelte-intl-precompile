@@ -1,29 +1,24 @@
 const getFirstMatch = (base: string, pattern: RegExp) => {
   const match = pattern.exec(base);
 
-  // istanbul ignore if
   if (!match) return null;
 
-  // istanbul ignore else
   return match[1] || null;
 };
 
 export const getLocaleFromHostname = (hostname: RegExp) => {
-  // istanbul ignore next
   if (typeof window === "undefined") return null;
 
   return getFirstMatch(window.location.hostname, hostname);
 };
 
 export const getLocaleFromPathname = (pathname: RegExp) => {
-  // istanbul ignore next
   if (typeof window === "undefined") return null;
 
   return getFirstMatch(window.location.pathname, pathname);
 };
 
 export const getLocaleFromNavigator = (ssrDefault?: string) => {
-  // istanbul ignore next
   if (typeof window === "undefined") {
     return ssrDefault || null;
   }
@@ -42,18 +37,26 @@ export const getLocaleFromAcceptLanguageHeader = (
   const locales = header
     .split(",")
     .map((locale) => locale.trim())
-    .map((locale) => {
+    .flatMap((locale) => {
       const directives = locale.split(";q=");
-      return {
-        locale: directives[0],
-        quality: parseFloat(directives[1]) || 1.0,
-      };
+      const l = directives[0];
+      const quality = directives[1];
+      if (l !== undefined && quality !== undefined) {
+        return [
+          {
+            locale: l,
+            quality: parseFloat(quality) || 1.0,
+          },
+        ];
+      } else {
+        return [];
+      }
     })
     .sort((a, b) => b.quality - a.quality);
 
   // If availableLocales is not defined return the first language from header
   if (!availableLocales || availableLocales.length === 0)
-    return locales[0].locale;
+    return locales[0]?.locale;
 
   locales.forEach((l) => (l.locale = l.locale.toLowerCase()));
 
@@ -83,19 +86,24 @@ export const getLocaleFromAcceptLanguageHeader = (
       continue;
     }
 
+    const se = locale.locale.split("-")[0];
+
     // header base match
-    const baseMatch = getArrayElementCaseInsensitive(
-      availableLocales,
-      locale.locale.split("-")[0]
-    );
-    if (baseMatch) {
-      return baseMatch;
+    if (se !== undefined) {
+      const baseMatch = getArrayElementCaseInsensitive(availableLocales, se);
+
+      if (baseMatch) {
+        return baseMatch;
+      }
     }
 
     // available base match
     for (const availableLocale of availableLocales) {
       const availableBase = availableLocale.split("-")[0];
-      if (availableBase.toLowerCase() === locale.locale) {
+      if (
+        availableBase !== undefined &&
+        availableBase.toLowerCase() === locale.locale
+      ) {
         // Remember base match to check if full match with same base exists
         firstAvailableBaseMatch = {
           match: availableLocale,
