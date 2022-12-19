@@ -1,6 +1,6 @@
-import type { ConfigureOptions } from "./types/index";
-import { $locale } from "./stores/locale";
-import { getOptions } from "./includes/utils";
+import type { ConfigureOptions } from "./types/index.js";
+import { $locale } from "./stores/instanceState.js";
+import { getOptions } from "./includes/utils.js";
 
 export function init(opts: ConfigureOptions) {
   const initialLocale = opts.initialLocale || opts.fallbackLocale;

@@ -1,5 +1,5 @@
-import { getMessageFromDictionary } from "../stores/dictionary";
-import { getPossibleLocales } from "./utils";
+import { getMessageFromDictionary } from "../stores/instanceState.js";
+import { getPossibleLocales } from "./utils.js";
 
 export const lookup = (path: string, refLocale: string) => {
   if (refLocale == null) return undefined;

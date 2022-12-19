@@ -14,8 +14,7 @@ import {
   getNumberFormatter,
 } from "../includes/formatters";
 import { getCurrentLocale } from "../includes/utils";
-import { $dictionary } from "./dictionary";
-import { $locale } from "./locale";
+import { $dictionary, $locale } from "./instanceState";
 
 export const formatMessage: MessageFormatter = (
   currentLocale,

@@ -3,9 +3,9 @@ import {
   hasLocaleDictionary,
   $dictionary,
   addMessages,
-} from "../stores/dictionary";
+} from "../stores/instanceState.js";
 import { getPossibleLocales, getOptions } from "../includes/utils";
-import { $isLoading } from "../stores/loading";
+import { $isLoading } from "../stores/instanceState.js";
 
 type Queue = Set<MessagesLoader>;
 const loaderQueue: Record<string, Queue> = {};
@@ -33,6 +33,8 @@ export function hasLocaleQueue(locale: string) {
 }
 
 const activeLocaleFlushes: { [key: string]: Promise<void> } = {};
+
+// Wait for the specified locale to be ready to be rendered
 export function flush(locale: string) {
   if (!hasLocaleQueue(locale)) return Promise.resolve();
   if (locale in activeLocaleFlushes) return activeLocaleFlushes[locale];
@@ -65,7 +67,8 @@ export function flush(locale: string) {
   return activeLocaleFlushes[locale];
 }
 
-export function registerLocaleLoader(locale: string, loader: MessagesLoader) {
+// Add a locale with a function that resolves to the translations
+export function register(locale: string, loader: MessagesLoader) {
   let queue = getLocaleQueue(locale);
 
   if (queue === undefined) {

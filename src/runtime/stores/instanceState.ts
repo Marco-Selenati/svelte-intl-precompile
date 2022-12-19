@@ -1,4 +1,5 @@
-// @ts-ignore
+import { flush, hasLocaleQueue } from "../includes/loaderQueue";
+import { getCurrentLocale, setCurrentLocale } from "../includes/utils";
 import { writable, derived } from "svelte/store";
 import type {
   LocaleDictionary,
@@ -7,6 +8,33 @@ import type {
   LocaleDictionaryValue,
 } from "../types/index";
 import { getPossibleLocales } from "../includes/utils";
+
+const $locale = writable("");
+
+$locale.subscribe((newLocale: string) => {
+  setCurrentLocale(newLocale);
+
+  if (typeof window !== "undefined") {
+    if (newLocale !== "") {
+      document.documentElement.setAttribute("lang", newLocale);
+    }
+  }
+});
+
+const localeSet = $locale.set;
+$locale.set = (newLocale: string): void | Promise<void> => {
+  if (getClosestAvailableLocale(newLocale) && hasLocaleQueue(newLocale)) {
+    return flush(newLocale).then(() => localeSet(newLocale));
+  }
+  return localeSet(newLocale);
+};
+
+// istanbul ignore next
+$locale.update = (fn: (locale: string) => void) => {
+  let currentLocale = getCurrentLocale();
+  fn(currentLocale);
+  localeSet(currentLocale);
+};
 
 let dictionary: Dictionary;
 const $dictionary = writable<Dictionary>({});
@@ -76,5 +104,9 @@ const $locales = /*@__PURE__*/ derived([$dictionary], ([$dictionary]) =>
   Object.keys($dictionary)
 );
 $dictionary.subscribe((newDictionary) => (dictionary = newDictionary));
+
+export const $isLoading = writable(false);
+
+export { $locale };
 
 export { $dictionary, $locales };

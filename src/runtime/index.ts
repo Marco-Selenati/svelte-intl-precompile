@@ -1,25 +1,19 @@
-import { flush } from "./includes/loaderQueue";
-import { getOptions, getCurrentLocale } from "./includes/utils";
-export * from "./includes/localeGetters";
-export * from "./includes/utils";
-
+import { flush } from "./includes/loaderQueue.js";
+import { getOptions, getCurrentLocale } from "./includes/utils.js";
+export * from "./includes/localeGetters.js";
+export * from "./includes/utils.js";
 export function waitLocale(locale?: string) {
   return flush(locale || getCurrentLocale() || getOptions().initialLocale);
 }
-
 export { init } from "./configs";
-
-export { $locale as locale } from "./stores/locale";
-
+export { $locale as locale } from "./stores/instanceState.js";
 export {
   $dictionary as dictionary,
   $locales as locales,
   addMessages,
-} from "./stores/dictionary";
-export { registerLocaleLoader as register } from "./includes/loaderQueue";
-
-export { $isLoading as isLoading } from "./stores/loading";
-
+} from "./stores/instanceState.js";
+export { register } from "./includes/loaderQueue";
+export { $isLoading as isLoading } from "./stores/instanceState.js";
 import { formatTime, formatDate, formatNumber } from "./stores/formatters";
 import type { IntlFormatterOptions } from "./types";
 export {
@@ -30,8 +24,6 @@ export {
   $formatTime as time,
   $getJSON as json,
 } from "./stores/formatters";
-
-// low-level
 export {
   getDateFormatter,
   getNumberFormatter,
@@ -86,4 +78,4 @@ export function __time(value: Date, format: string): string {
   return formatTime(getCurrentLocale(), value, format);
 }
 
-export type { TypedFormat } from "./types";
+export type { TypedFormat } from "./types/index.js";
