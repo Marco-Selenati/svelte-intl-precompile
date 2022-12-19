@@ -122,7 +122,7 @@ export async function transformCode(
   const basename = path.parse(options["filename"]).name;
   const hyphenator = await getHyphenator(basename);
 
-  const intlPrecompiler = compiler("@gigahatch/svelte-intl-precompile", (v) => {
+  const intlPrecompiler = compiler((v) => {
     const ast = parse(v, { ignoreTag: true });
 
     if (hyphenate) {

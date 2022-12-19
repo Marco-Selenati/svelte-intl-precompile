@@ -66,10 +66,7 @@ type BuildOptions = {
 
 const USED_HELPERS = "usedHelpers";
 
-export default function build(
-  runtimeImportPath = "@gigahatch/precompile-intl-runtime",
-  parser: (v: string) => MessageFormatElement[]
-) {
+export default function build(parser: (v: string) => MessageFormatElement[]) {
   return declare(({ types: t, assertVersion }, _opts) => {
     assertVersion("^7.0");
 
@@ -93,8 +90,7 @@ export default function build(
       entry: MessageFormatElement,
       opts: BuildOptions
     ) {
-      if (isLiteralElement(entry))
-        return t.stringLiteral(entry.value);
+      if (isLiteralElement(entry)) return t.stringLiteral(entry.value);
       if (isTagElement(entry)) throw new Error("Tag elements not supported!");
       if (isPoundElement(entry))
         throw new Error("Pound elements not supported!");
@@ -210,7 +206,10 @@ export default function build(
           } else {
             objValue =
               objValueAST.length === 1
-                ? buildCallExpression(objValueAST[0] as MessageFormatElement, opts)
+                ? buildCallExpression(
+                    objValueAST[0] as MessageFormatElement,
+                    opts
+                  )
                 : buildTemplateLiteral(objValueAST, opts);
           }
           let normalizedKey = normalizePluralKey(key);
@@ -254,7 +253,10 @@ export default function build(
           } else {
             objValue =
               objValueAST.length === 1
-                ? buildCallExpression(objValueAST[0] as MessageFormatElement, opts)
+                ? buildCallExpression(
+                    objValueAST[0] as MessageFormatElement,
+                    opts
+                  )
                 : buildTemplateLiteral(objValueAST, opts);
           }
           let normalizedKey = normalizeKey(key);
@@ -317,7 +319,11 @@ export default function build(
             break;
           case 7: // # interpolation
             let lastPlural = pluralsStack[pluralsStack.length - 1];
-            if (lastPlural && lastPlural.offset !== null && lastPlural.offset !== 0) {
+            if (
+              lastPlural &&
+              lastPlural.offset !== null &&
+              lastPlural.offset !== 0
+            ) {
               expressions.push(
                 t.binaryExpression(
                   "-",
@@ -390,7 +396,7 @@ export default function build(
                   .map((name) =>
                     t.importSpecifier(t.identifier(name), t.identifier(name))
                   ),
-                t.stringLiteral(runtimeImportPath)
+                t.stringLiteral("@gigahatch/svelte-intl-precompile")
               );
               path.unshiftContainer("body", importDeclaration);
             }
