@@ -10,12 +10,6 @@ import { $isLoading } from "../stores/loading";
 type Queue = Set<MessagesLoader>;
 const loaderQueue: Record<string, Queue> = {};
 
-export function resetQueues() {
-  Object.keys(loaderQueue).forEach((key) => {
-    delete loaderQueue[key];
-  });
-}
-
 function removeLocaleFromQueue(locale: string) {
   delete loaderQueue[locale];
 }
