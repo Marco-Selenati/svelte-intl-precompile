@@ -9,8 +9,8 @@
       "types": "./dist/index.d.ts"
     },
     "./plugin": {
-      "import": "./dist/plugin.js",
-      "types": "./dist/plugin.d.ts"
+      "import": "./dist/plugin/plugin.js",
+      "types": "./dist/plugin/plugin.d.ts"
     }
   },
   "sideEffects": false,
@@ -19,7 +19,7 @@
     "url": "https://github.com/gigahatch/svelte-intl-precompile"
   },
   "scripts": {
-    "build": "vite build && tsc --project tsconfig.json",
+    "build": "vite build && tsc --project tsconfig.plugin.json",
     "postbuild": "cp src/locales.d.ts dist/locales.d.ts",
     "test": "cross-env TZ=utc vitest",
     "coverage": "vitest run --coverage",

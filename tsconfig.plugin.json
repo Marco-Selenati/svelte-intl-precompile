@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "declaration": true,
+    "outDir": "dist/plugin/"
+  },
+  "include": ["./src/plugin.ts"]
+}
