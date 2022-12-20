@@ -6,7 +6,7 @@ export type NestedTranslations =
   | { [Key: string]: NestedTranslations };
 
 export interface MessagesLoader {
-  (): Promise<{ default: NestedTranslations }>;
+  (): Promise<NestedTranslations>;
 }
 
 const registeredLocaleGroups: Record<string, MessagesLoader[]> = {};
