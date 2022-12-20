@@ -1,6 +1,6 @@
 {
   "name": "@gigahatch/svelte-intl-precompile",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "I18n library for Svelte.js that analyzes your keys at build time for max performance and minimal footprint",
   "type": "module",
   "exports": {
