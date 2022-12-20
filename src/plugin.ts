@@ -1,11 +1,9 @@
 import * as path from "path";
 import * as fs from "fs/promises";
-
 import * as babel from "@babel/core";
 import compiler from "./compiler.js";
 import type { Plugin } from "vite";
 import createHyphenator, { HyphenationFunctionSync } from "hyphen";
-
 import flatten from "flat";
 import {
   MessageFormatElement,
