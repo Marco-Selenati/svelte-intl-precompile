@@ -46,19 +46,6 @@ export type IntlFormatterOptions<T> = T & {
   locale?: string;
 };
 
-export interface GetClientLocaleOptions {
-  navigator?: boolean;
-  hash?: string;
-  search?: string;
-  pathname?: RegExp;
-  hostname?: RegExp;
-}
-
-export interface ConfigureOptions {
-  fallbackLocale: string;
-  initialLocale?: string;
-}
-
 export type TypedFormat<T = string> = Readable<
   (
     id: T | MessageObjectWithId<T>,
