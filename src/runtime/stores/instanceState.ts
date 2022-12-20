@@ -19,7 +19,7 @@ export async function flush(groupName: string): Promise<void> {
   }
   const promises = localeGroup.map((lg) => lg());
   const group = await Promise.all(promises);
-  addMessages(groupName, ...group.map((g) => g.default));
+  addMessages(groupName, ...group);
 }
 
 // Add a localeGroup with a function that resolves to the translations
