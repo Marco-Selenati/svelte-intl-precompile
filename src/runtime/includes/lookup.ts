@@ -5,9 +5,5 @@ export const lookup = (path: string, localeGroup: string) => {
 
   const message = getMessageFromDictionary(localeGroup, path);
 
-  if (message) {
-    return message;
-  }
-
-  return undefined;
+  return message;
 };

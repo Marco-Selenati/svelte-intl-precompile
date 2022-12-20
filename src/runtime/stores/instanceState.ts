@@ -1,10 +1,6 @@
 import { setCurrentLocale } from "../includes/utils";
 import { writable, derived, readable, Subscriber } from "svelte/store";
-import type {
-  LocaleDictionary,
-  Dictionary,
-  LocaleDictionaryValue,
-} from "../types/index";
+import type { Dictionary } from "../types/index";
 
 export type NestedTranslations =
   | string
@@ -60,39 +56,34 @@ const $locale = readable("", function start(set) {
 let dictionary: Dictionary;
 const $dictionary = writable<Dictionary>({});
 
-export function getLocaleDictionary(locale: string) {
-  return (dictionary[locale] as LocaleDictionary) || null;
-}
-
 export function getDictionary() {
   return dictionary;
 }
 
-export function hasLocaleDictionary(locale: string) {
-  return locale in dictionary;
-}
-
 export function getMessageFromDictionary(locale: string, id: string) {
-  if (hasLocaleDictionary(locale)) {
-    const localeDictionary = getLocaleDictionary(locale);
-    if (id in localeDictionary) {
-      return localeDictionary[id];
+  const d = dictionary[locale];
+  if (d !== undefined) {
+    const topLocale = d[id];
+    if (topLocale !== undefined) {
+      return topLocale;
     }
 
-    const ids = id.split(".");
-    let tmpDict: any = localeDictionary;
-    for (let i = 0; i < ids.length; i++) {
-      const idPart = ids[i];
+    const idParts = id.split(".");
+    let dictionaryLevel = d;
+    for (let i = 0; i < idParts.length; i++) {
+      const idPart = idParts[i];
       if (idPart === undefined) {
-        return null;
+        return undefined;
       }
-      if (typeof tmpDict[idPart] !== "object") {
-        return (tmpDict[idPart] as LocaleDictionaryValue) || null;
+      const nextLevel = dictionaryLevel[idPart];
+      if (typeof nextLevel === "string" || typeof nextLevel === "function") {
+        return nextLevel;
+      } else {
+        dictionaryLevel = nextLevel;
       }
-      tmpDict = tmpDict[idPart];
     }
   }
-  return null;
+  return undefined;
 }
 
 export function addMessages(locale: string, ...partials: NestedTranslations[]) {
