@@ -13,8 +13,7 @@ import {
   getDateFormatter,
   getNumberFormatter,
 } from "../includes/formatters";
-import { getCurrentLocale } from "../includes/utils";
-import { $dictionary, $locale } from "./instanceState";
+import { $dictionary, $locale, getCurrentLocale } from "./instanceState";
 
 export const formatMessage: MessageFormatter = (
   currentLocale,

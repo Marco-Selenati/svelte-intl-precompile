@@ -1,4 +1,3 @@
-import { setCurrentLocale } from "../includes/utils";
 import { writable, derived, readable, Subscriber } from "svelte/store";
 import type { Dictionary } from "../types/index";
 
@@ -36,13 +35,19 @@ export async function changeLocale(newLocale: string) {
     setLocale(newLocale);
   }
 
-  setCurrentLocale(newLocale);
+  currentLocale = newLocale;
 
   if (typeof window !== "undefined") {
     if (newLocale !== "") {
       document.documentElement.setAttribute("lang", newLocale);
     }
   }
+}
+
+let currentLocale: string;
+
+export function getCurrentLocale() {
+  return currentLocale;
 }
 
 let setLocale: null | Subscriber<string> = null;

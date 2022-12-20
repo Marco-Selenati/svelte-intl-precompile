@@ -1,6 +1,4 @@
-import { getCurrentLocale } from "./includes/utils.js";
 export * from "./includes/localeGetters.js";
-export * from "./includes/utils.js";
 export {
   $dictionary as dictionary,
   $locales as locales,
@@ -10,6 +8,7 @@ export {
   changeLocale,
 } from "./stores/instanceState.js";
 import { formatTime, formatDate, formatNumber } from "./stores/formatters.js";
+import { getCurrentLocale } from "./stores/instanceState.js";
 import type { IntlFormatterOptions } from "./types";
 export {
   formatMessage,

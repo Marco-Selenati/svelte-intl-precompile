@@ -1,4 +1,4 @@
-import { getCurrentLocale } from "./utils";
+import { getCurrentLocale } from "../stores/instanceState";
 
 const defaultNumber: Record<string, Intl.NumberFormatOptions> = {
   scientific: { notation: "scientific" },
