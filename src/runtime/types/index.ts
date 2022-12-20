@@ -1,9 +1,5 @@
 import type { Readable } from "svelte/store";
 
-export type LocaleDictionaryValue = string | ((...args: any[]) => string);
-export type LocaleDictionary = Record<string, LocaleDictionaryValue>;
-export type Dictionary = Record<string, LocaleDictionary>;
-
 export interface MessageObject {
   locale?: string;
   format?: string;

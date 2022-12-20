@@ -257,6 +257,21 @@ describe("__number", async function () {
   });
 });
 
+describe("Non existent translations", function () {
+  it("Show the key string when the translation is missing", () => {
+    addMessages("en-US", {
+      complex: (a, b) => `This is a function that interpolates ${b} and ${a}`,
+    });
+    let unsubscribe = format.subscribe((t) => {
+      expect(t("s")).toBe("s");
+      expect(t("n.d")).toBe("n.d");
+      expect(t("n.f")).toBe("n.f");
+      expect(t("c", { values: { a: "HA", b: "BO" } })).toBe("c");
+    });
+    unsubscribe();
+  });
+});
+
 describe("locale", async function () {
   it("subscribes get notified when its value is updated", async () => {
     expect.assertions(2);

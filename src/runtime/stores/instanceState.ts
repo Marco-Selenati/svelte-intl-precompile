@@ -1,5 +1,4 @@
 import { writable, derived, readable, Subscriber } from "svelte/store";
-import type { Dictionary } from "../types/index";
 
 export type NestedTranslations =
   | string
@@ -58,6 +57,10 @@ const $locale = readable("", function start(set) {
   return function stop() {};
 });
 
+interface Dictionary {
+  [locale: string]: NestedTranslations;
+}
+
 let dictionary: Dictionary;
 const $dictionary = writable<Dictionary>({});
 
@@ -81,7 +84,12 @@ export function getMessageFromDictionary(locale: string, id: string) {
         return undefined;
       }
       const nextLevel = dictionaryLevel[idPart];
-      if (typeof nextLevel === "string" || typeof nextLevel === "function") {
+      if (nextLevel === undefined) {
+        return undefined;
+      } else if (
+        typeof nextLevel === "string" ||
+        typeof nextLevel === "function"
+      ) {
         return nextLevel;
       } else {
         dictionaryLevel = nextLevel;
@@ -93,7 +101,11 @@ export function getMessageFromDictionary(locale: string, id: string) {
 
 export function addMessages(locale: string, ...partials: NestedTranslations[]) {
   $dictionary.update((d) => {
-    d[locale] = Object.assign(d[locale] ?? {}, ...partials);
+    let ld = d[locale];
+    if (ld === undefined) {
+      ld = {};
+    }
+    d[locale] = Object.assign({}, ld, ...partials);
     return d;
   });
 }
